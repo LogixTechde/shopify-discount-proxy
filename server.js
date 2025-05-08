@@ -1,5 +1,7 @@
 const express = require("express");
 const axios = require("axios");
+require("dotenv").config();
+
 const app = express();
 app.use(express.json());
 
@@ -25,6 +27,10 @@ function generateCode(rabatt) {
   return `RABATT${rabatt}-${random}`;
 }
 
+app.get("/", (req, res) => {
+  res.send("LogixTech Code Generator läuft!");
+});
+
 app.post("/generate-code", async (req, res) => {
   const { email, rabatt } = req.body;
   if (!email || !rabatt) {
@@ -46,9 +52,9 @@ app.post("/generate-code", async (req, res) => {
           value_type: "percentage",
           value: `-${rabatt}`,
           customer_selection: "prerequisite",
-          prerequisite_subtotal_range: minSubtotal
-            ? { greater_than_or_equal_to: minSubtotal }
-            : undefined,
+          prerequisite_subtotal_range: {
+            greater_than_or_equal_to: minSubtotal
+          },
           starts_at: new Date().toISOString(),
           usage_limit: 1,
           prerequisite_customer_email: email
@@ -85,4 +91,6 @@ app.post("/generate-code", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`App läuft auf Port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`App läuft auf Port ${PORT}`);
+});
